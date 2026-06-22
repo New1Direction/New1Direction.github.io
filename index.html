@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ares — verifiable AI agent infrastructure · Rust · security</title>
+<meta name="description" content="Self-taught engineer building verifiable AI agent infrastructure, Rust systems, and security tooling. Maker of korg, ningen-shikkaku, and korgex." />
+<meta property="og:title" content="ares — verifiable AI agent infrastructure" />
+<meta property="og:description" content="Tooling that makes autonomous AI agents verifiable, recoverable, and safe to run." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink:        oklch(15% 0.012 270);
+    --ink-2:      oklch(18% 0.014 270);
+    --surface:    oklch(21% 0.015 270);
+    --surface-2:  oklch(25% 0.016 270);
+    --line:       oklch(30% 0.015 270);
+    --bone:       oklch(93% 0.012 85);
+    --bone-dim:   oklch(74% 0.012 85);
+    --muted:      oklch(58% 0.012 270);
+    --signal:     oklch(88% 0.21 124);   /* electric lime */
+    --signal-dim: oklch(70% 0.17 124);
+    --ember:      oklch(72% 0.16 47);
+
+    --font-display: "Fraunces", Georgia, serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+
+    --maxw: 1140px;
+    --gut: clamp(1.25rem, 1rem + 3vw, 4rem);
+    --space-section: clamp(5rem, 4rem + 8vw, 11rem);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+  body {
+    background: var(--ink);
+    color: var(--bone);
+    font-family: var(--font-mono);
+    font-size: clamp(0.92rem, 0.88rem + 0.2vw, 1rem);
+    line-height: 1.65;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* blueprint grid + grain atmosphere */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(to right, color-mix(in oklch, var(--line) 55%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklch, var(--line) 55%, transparent) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
+    opacity: 0.35;
+    pointer-events: none; z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.04; pointer-events: none; z-index: 0; mix-blend-mode: screen;
+  }
+
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gut); position: relative; z-index: 1; }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* selection */
+  ::selection { background: var(--signal); color: var(--ink); }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem var(--gut);
+    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    background: color-mix(in oklch, var(--ink) 72%, transparent);
+    border-bottom: 1px solid color-mix(in oklch, var(--line) 60%, transparent);
+  }
+  .topbar .mark { color: var(--signal); font-weight: 700; }
+  .topbar nav { display: flex; gap: 1.4rem; color: var(--muted); }
+  .topbar nav a { transition: color 0.2s var(--ease); }
+  .topbar nav a:hover { color: var(--bone); }
+  @media (max-width: 640px){ .topbar nav { display: none; } }
+
+  /* ---------- hero ---------- */
+  .hero { padding-top: clamp(3.5rem, 3rem + 6vw, 7rem); padding-bottom: var(--space-section); }
+  .eyebrow {
+    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--signal-dim);
+    display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.6rem;
+  }
+  .eyebrow::before { content: ""; width: 2.2rem; height: 1px; background: var(--signal-dim); display: inline-block; }
+
+  h1.title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2.7rem, 1.4rem + 7vw, 6.6rem);
+    line-height: 0.98; letter-spacing: -0.02em;
+    color: var(--bone);
+    margin-bottom: 1.7rem;
+  }
+  h1.title em { font-style: italic; color: var(--signal); font-weight: 500; }
+
+  .lede {
+    max-width: 46ch; color: var(--bone-dim);
+    font-size: clamp(1rem, 0.95rem + 0.35vw, 1.18rem); line-height: 1.7;
+    margin-bottom: 2.4rem;
+  }
+  .lede strong { color: var(--bone); font-weight: 500; }
+
+  .cta-row { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: center; }
+  .btn {
+    font-family: var(--font-mono); font-size: 0.84rem; letter-spacing: 0.02em;
+    padding: 0.8rem 1.3rem; border: 1px solid var(--line);
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease);
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary { background: var(--signal); color: var(--ink); border-color: var(--signal); font-weight: 700; }
+  .btn.primary:hover { background: var(--bone); border-color: var(--bone); }
+  .btn.ghost:hover { border-color: var(--signal); color: var(--signal); }
+  .btn svg { width: 1em; height: 1em; }
+
+  /* hash-chain motif */
+  .chain { margin-top: 3.4rem; display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+           font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+  .chain .blk {
+    border: 1px solid var(--line); padding: 0.45rem 0.7rem; background: var(--ink-2);
+    position: relative; white-space: nowrap;
+    transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+  }
+  .chain .blk:hover { color: var(--signal); border-color: var(--signal-dim); }
+  .chain .lnk { width: 1.5rem; height: 1px; background: var(--line); }
+  @media (max-width: 720px){ .chain { display: none; } }
+
+  /* ---------- section header ---------- */
+  .sec { padding-block: clamp(3rem, 2rem + 4vw, 5rem); }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+              border-top: 1px solid var(--line); padding-top: 1.2rem; margin-bottom: 2.8rem; }
+  .sec-head h2 {
+    font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em;
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.3rem); color: var(--bone);
+  }
+  .sec-head .idx { font-family: var(--font-mono); font-size: 0.74rem; color: var(--signal-dim); letter-spacing: 0.18em; }
+
+  /* ---------- flagship cards ---------- */
+  .flagship { display: grid; gap: 1.3rem; }
+  .fcard {
+    position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1.5rem;
+    align-items: start; padding: clamp(1.5rem, 1rem + 2vw, 2.6rem);
+    background: linear-gradient(180deg, var(--ink-2), var(--ink));
+    border: 1px solid var(--line); overflow: hidden;
+    transition: border-color 0.35s var(--ease), transform 0.35s var(--ease);
+  }
+  .fcard::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--signal); transform: scaleY(0); transform-origin: top;
+    transition: transform 0.4s var(--ease);
+  }
+  .fcard:hover { border-color: color-mix(in oklch, var(--signal) 40%, var(--line)); transform: translateY(-3px); }
+  .fcard:hover::before { transform: scaleY(1); }
+  .fcard .num { position: absolute; right: clamp(1rem,2vw,2rem); top: clamp(1rem,2vw,2rem);
+                font-family: var(--font-display); font-size: 3.4rem; color: var(--surface-2); line-height: 1; font-weight: 600; }
+  .fcard .body { max-width: 60ch; }
+  .fcard h3 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem,1.2rem+1.4vw,2.1rem);
+              color: var(--bone); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.7rem; }
+  .fcard h3 .lang { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase;
+                    color: var(--signal); border: 1px solid var(--signal-dim); padding: 0.15rem 0.5rem; border-radius: 2px; }
+  .fcard .tag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--signal-dim); margin-bottom: 1rem; letter-spacing: 0.01em; }
+  .fcard p { color: var(--bone-dim); font-size: 0.94rem; line-height: 1.7; margin-bottom: 1.3rem; }
+  .fcard .links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .fcard .links a {
+    font-family: var(--font-mono); font-size: 0.76rem; color: var(--bone-dim);
+    padding: 0.42rem 0.8rem; border: 1px solid var(--line);
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+  }
+  .fcard .links a:hover { color: var(--ink); background: var(--signal); border-color: var(--signal); }
+  @media (max-width: 640px){ .fcard { grid-template-columns: 1fr; } .fcard .num { font-size: 2.4rem; } }
+
+  /* ---------- selected work grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.1rem; }
+  .scard {
+    padding: 1.4rem; border: 1px solid var(--line); background: var(--ink-2);
+    display: flex; flex-direction: column; gap: 0.55rem;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease), background 0.3s var(--ease);
+  }
+  .scard:hover { border-color: var(--signal-dim); transform: translateY(-3px); background: var(--surface); }
+  .scard .top { display: flex; align-items: center; justify-content: space-between; }
+  .scard h4 { font-family: var(--font-display); font-size: 1.18rem; font-weight: 600; color: var(--bone); }
+  .scard .arrow { color: var(--muted); transition: color 0.2s var(--ease), transform 0.2s var(--ease); }
+  .scard:hover .arrow { color: var(--signal); transform: translate(2px,-2px); }
+  .scard p { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
+  .scard .meta { margin-top: auto; padding-top: 0.6rem; font-family: var(--font-mono); font-size: 0.68rem;
+                 letter-spacing: 0.08em; color: var(--signal-dim); text-transform: uppercase; }
+
+  /* ---------- focus strip ---------- */
+  .focus { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; }
+  .focus .f { border: 1px solid var(--line); padding: 1.4rem; background: var(--ink-2); }
+  .focus .f .k { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--signal-dim); margin-bottom: 0.6rem; }
+  .focus .f p { color: var(--bone-dim); font-size: 0.88rem; line-height: 1.65; }
+
+  /* ---------- footer ---------- */
+  footer { border-top: 1px solid var(--line); padding-block: clamp(3rem,2rem+4vw,5rem); margin-top: var(--space-section); }
+  footer .big { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.8rem,1.2rem+3vw,3.4rem);
+                color: var(--bone); line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 1.8rem; }
+  footer .big a { color: var(--signal); border-bottom: 2px solid transparent; transition: border-color 0.25s var(--ease); }
+  footer .big a:hover { border-color: var(--signal); }
+  footer .row { display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: center; justify-content: space-between;
+                font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
+  footer .row .links { display: flex; gap: 1.2rem; }
+  footer .row a:hover { color: var(--signal); }
+
+  /* ---------- reveal animation ---------- */
+  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+  .reveal.in { opacity: 1; transform: none; }
+  .hero .reveal { transition-delay: var(--d, 0ms); }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="mark">ares<span style="color:var(--muted)">@New1Direction</span></span>
+    <nav>
+      <a href="#flagship">flagships</a>
+      <a href="#work">work</a>
+      <a href="#focus">focus</a>
+      <a href="#contact">contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow reveal" style="--d:0ms">Self-taught engineer</p>
+      <h1 class="title reveal" style="--d:80ms">Verifiable AI agent<br>infrastructure, <em>Rust</em><br>systems &amp; security.</h1>
+      <p class="lede reveal" style="--d:180ms">I build tooling that makes autonomous AI agents <strong>verifiable, recoverable, and safe to run</strong> — a tamper-evident execution ledger, burn-after-reading secret handling, and a coding agent that keeps its receipts.</p>
+      <div class="cta-row reveal" style="--d:260ms">
+        <a class="btn primary" href="https://github.com/New1Direction" target="_blank" rel="noopener">
+          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+          github.com/New1Direction
+        </a>
+        <a class="btn ghost" href="#flagship">view the work ↓</a>
+      </div>
+
+      <div class="chain reveal" style="--d:360ms" aria-hidden="true">
+        <span class="blk">block#0 · genesis</span><span class="lnk"></span>
+        <span class="blk">sha256:0a9f…c41</span><span class="lnk"></span>
+        <span class="blk">sha256:7b2e…d08</span><span class="lnk"></span>
+        <span class="blk">sha256:e1c4…5af</span><span class="lnk"></span>
+        <span class="blk" style="color:var(--signal);border-color:var(--signal-dim)">verified ✓</span>
+      </div>
+    </section>
+
+    <section class="sec wrap" id="flagship">
+      <div class="sec-head reveal">
+        <h2>Flagship projects</h2>
+        <span class="idx">01 — 03</span>
+      </div>
+      <div class="flagship">
+
+        <article class="fcard reveal">
+          <span class="num">01</span>
+          <div class="body">
+            <h3>korg <span class="lang">Rust</span></h3>
+            <p class="tag">A causally-ordered, rewindable event-ledger for autonomous AI agents.</p>
+            <p>Every step an agent takes is recorded in a hash-chained, tamper-evident ledger anyone can independently verify — then rewound to any prior state. Zero-trust by design, and no blockchain anywhere in sight.</p>
+            <div class="links">
+              <a href="https://github.com/New1Direction/korg" target="_blank" rel="noopener">repository →</a>
+              <a href="https://yvaehkorg.lol" target="_blank" rel="noopener">live ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fcard reveal">
+          <span class="num">02</span>
+          <div class="body">
+            <h3>ningen-shikkaku <span class="lang">Rust</span></h3>
+            <p class="tag">Burn-after-reading secrets for AI agents.</p>
+            <p>Keys live in <code>mlock</code>'d, non-swappable RAM, are served to agents over MCP, and are destroyed after N reads — or the instant your session dies. A hardened daemon (seccomp allowlist, no core dumps, a non-elidable memory wipe) shipped with a fully-documented, honest threat model.</p>
+            <div class="links">
+              <a href="https://github.com/New1Direction/ningen-shikkaku" target="_blank" rel="noopener">repository →</a>
+              <a href="https://new1direction.github.io/ningen-shikkaku/" target="_blank" rel="noopener">docs ↗</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fcard reveal">
+          <span class="num">03</span>
+          <div class="body">
+            <h3>korgex <span class="lang">Python</span></h3>
+            <p class="tag">A verifiable AI coding agent that keeps the receipts.</p>
+            <p>Works with any model and keeps a checkable record of every change it makes — the agent loop bolted to korg's verification guarantees. Published on PyPI.</p>
+            <div class="links">
+              <a href="https://github.com/New1Direction/korgex" target="_blank" rel="noopener">repository →</a>
+              <a href="https://korgex-docs.pages.dev" target="_blank" rel="noopener">docs ↗</a>
+              <a href="https://pypi.org/project/korgex/" target="_blank" rel="noopener">pypi ↗</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="sec wrap" id="work">
+      <div class="sec-head reveal">
+        <h2>Selected work</h2>
+        <span class="idx">// the rest of the stack</span>
+      </div>
+      <div class="grid">
+        <a class="scard reveal" href="https://github.com/New1Direction/thumper" target="_blank" rel="noopener">
+          <div class="top"><h4>thumper</h4><span class="arrow">↗</span></div>
+          <p>The local execution and self-recovery substrate beneath korgex: runs code fast and repairs its own errors.</p>
+          <span class="meta">Rust</span>
+        </a>
+        <a class="scard reveal" href="https://wmcp.sh" target="_blank" rel="noopener">
+          <div class="top"><h4>webmcp-anything</h4><span class="arrow">↗</span></div>
+          <p>Turn any website into agent-callable MCP tools with one line of config. Live at wmcp.sh.</p>
+          <span class="meta">TypeScript · live</span>
+        </a>
+        <a class="scard reveal" href="https://github.com/New1Direction/RepoLens" target="_blank" rel="noopener">
+          <div class="top"><h4>RepoLens</h4><span class="arrow">↗</span></div>
+          <p>Click any repository and get a straight answer on whether to actually use it.</p>
+          <span class="meta">JavaScript</span>
+        </a>
+        <a class="scard reveal" href="https://github.com/New1Direction/coherence-auditor" target="_blank" rel="noopener">
+          <div class="top"><h4>coherence-auditor</h4><span class="arrow">↗</span></div>
+          <p>Detects an LLM contradicting its own stated probabilities and prices the slip as a guaranteed-loss bet.</p>
+          <span class="meta">Python</span>
+        </a>
+        <a class="scard reveal" href="https://github.com/New1Direction/pi-platform" target="_blank" rel="noopener">
+          <div class="top"><h4>pi-platform</h4><span class="arrow">↗</span></div>
+          <p>A deterministic semantic execution kernel with a governance-first architecture.</p>
+          <span class="meta">Python</span>
+        </a>
+        <a class="scard reveal" href="https://github.com/New1Direction?tab=repositories" target="_blank" rel="noopener">
+          <div class="top"><h4>everything else</h4><span class="arrow">↗</span></div>
+          <p>The full set of public repositories on GitHub.</p>
+          <span class="meta">browse →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="sec wrap" id="focus">
+      <div class="sec-head reveal">
+        <h2>What I work on</h2>
+        <span class="idx">focus areas</span>
+      </div>
+      <div class="focus">
+        <div class="f reveal"><div class="k">Agent infrastructure</div><p>Ledgers, execution substrates, and verification layers that make autonomous agents auditable and recoverable rather than opaque.</p></div>
+        <div class="f reveal"><div class="k">Rust systems</div><p>Low-level, correctness-first systems work — locked memory, syscall sandboxing, deterministic state machines, hash-chained data structures.</p></div>
+        <div class="f reveal"><div class="k">Security</div><p>Secret handling, threat modeling that states its own limits honestly, and tooling that shrinks the window plaintext is reachable.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <div class="wrap">
+      <p class="big reveal">Open to roles in AI infrastructure, Rust systems,<br>and security. <a href="https://github.com/New1Direction" target="_blank" rel="noopener">Reach me on GitHub →</a></p>
+      <div class="row reveal">
+        <span>© 2026 · ares / New1Direction</span>
+        <span class="links">
+          <a href="https://github.com/New1Direction" target="_blank" rel="noopener">GitHub</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // staggered reveal on scroll (compositor-friendly: opacity + transform only)
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    // hero reveals fire immediately on load
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.hero .reveal').forEach((el) => el.classList.add('in'));
+    });
+  </script>
+</body>
+</html>
