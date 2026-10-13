@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Prepare an Amp orb for this repository. The site is a single static
+# index.html with no build step or dependencies; the only tool it needs is
+# python3, which serves the preview declared in .amp/services.yaml.
+set -euo pipefail
+
+step() { printf '[setup] %s\n' "$*"; }
+
+start=$SECONDS
+if command -v python3 >/dev/null 2>&1; then
+  step "python3 present: $(python3 --version 2>&1)"
+else
+  step "installing python3"
+  sudo apt-get update -qq
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq python3
+fi
+step "done in $((SECONDS - start))s"
