@@ -2,388 +2,594 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ares — verifiable AI agent infrastructure · Rust · security</title>
-<meta name="description" content="Self-taught engineer building verifiable AI agent infrastructure, Rust systems, and security tooling. Maker of korg, ningen-shikkaku, and korgex." />
-<meta property="og:title" content="ares — verifiable AI agent infrastructure" />
-<meta property="og:description" content="Tooling that makes autonomous AI agents verifiable, recoverable, and safe to run." />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ares — maker of repo.ing, Ohiyo, and wmcp.sh</title>
+<meta name="description" content="ares builds and ships live products: repo.ing, the market layer for open source; Ohiyo, a free, open source group chat; and wmcp.sh, which turns any URL into MCP tools for AI agents." />
+<link rel="canonical" href="https://new1direction.github.io/" />
+<meta name="theme-color" content="#121318" />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://new1direction.github.io/" />
+<meta property="og:title" content="ares — repo.ing, Ohiyo, and wmcp.sh" />
+<meta property="og:description" content="Three live products for open source builders, private groups, and AI agent developers, plus the Rust systems work behind them." />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@AresAgent" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23121318'/%3E%3Cpath d='M9 23 16 8l7 15M11.6 18h8.8' fill='none' stroke='%23d8f36a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --ink:        oklch(15% 0.012 270);
-    --ink-2:      oklch(18% 0.014 270);
-    --surface:    oklch(21% 0.015 270);
-    --surface-2:  oklch(25% 0.016 270);
-    --line:       oklch(30% 0.015 270);
-    --bone:       oklch(93% 0.012 85);
-    --bone-dim:   oklch(74% 0.012 85);
-    --muted:      oklch(58% 0.012 270);
-    --signal:     oklch(88% 0.21 124);   /* electric lime */
-    --signal-dim: oklch(70% 0.17 124);
-    --ember:      oklch(72% 0.16 47);
+    --ink:      #121318;
+    --ink-2:    #171920;
+    --panel:    #1c1e26;
+    --panel-2:  #232631;
+    --line:     #2e3240;
+    --line-2:   #3b4052;
+    --text:     #eeeae2;
+    --text-2:   #bdb9b1;
+    --muted:    #9a9ca8;
 
-    --font-display: "Fraunces", Georgia, serif;
-    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+    --lime:   #d8f36a;  /* site / korg */
+    --repo:   #6fe3a8;  /* repo.ing */
+    --ohiyo:  #ff9277;  /* Ohiyo coral */
+    --wmcp:   #67e3f5;  /* wmcp.sh cyan */
+    --accent: var(--lime);
 
-    --maxw: 1140px;
-    --gut: clamp(1.25rem, 1rem + 3vw, 4rem);
-    --space-section: clamp(5rem, 4rem + 8vw, 11rem);
+    --display: "Fraunces", Georgia, "Times New Roman", serif;
+    --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    --maxw: 1160px;
+    --gut: clamp(1.15rem, 0.8rem + 2.4vw, 3rem);
+    --radius: 14px;
     --ease: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-
+  *, *::before, *::after { box-sizing: border-box; }
+  * { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; -webkit-text-size-adjust: 100%; }
   body {
     background: var(--ink);
-    color: var(--bone);
-    font-family: var(--font-mono);
-    font-size: clamp(0.92rem, 0.88rem + 0.2vw, 1rem);
-    line-height: 1.65;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: clamp(1rem, 0.96rem + 0.18vw, 1.0625rem);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    position: relative;
   }
-
-  /* blueprint grid + grain atmosphere */
   body::before {
-    content: "";
-    position: fixed; inset: 0;
-    background-image:
-      linear-gradient(to right, color-mix(in oklch, var(--line) 55%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklch, var(--line) 55%, transparent) 1px, transparent 1px);
-    background-size: 64px 64px;
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent 75%);
-    opacity: 0.35;
-    pointer-events: none; z-index: 0;
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(60rem 30rem at 85% -10%, rgb(216 243 106 / 0.07), transparent 70%),
+      radial-gradient(50rem 30rem at -10% 10%, rgb(103 227 245 / 0.05), transparent 70%);
   }
-  body::after {
-    content: "";
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-    opacity: 0.04; pointer-events: none; z-index: 0; mix-blend-mode: screen;
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; }
+  code, kbd, pre { font-family: var(--mono); }
+  ::selection { background: var(--lime); color: var(--ink); }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+  .skip {
+    position: absolute; left: 1rem; top: -4rem; z-index: 100;
+    background: var(--lime); color: var(--ink); padding: 0.6rem 1rem; border-radius: 8px;
+    font-weight: 600; text-decoration: none;
   }
+  .skip:focus { top: 1rem; }
 
-  .wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gut); position: relative; z-index: 1; }
+  .wrap { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--gut); }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-  a { color: inherit; text-decoration: none; }
-
-  /* selection */
-  ::selection { background: var(--signal); color: var(--ink); }
-
-  /* ---------- top bar ---------- */
-  .topbar {
+  /* ---------- header ---------- */
+  .top {
     position: sticky; top: 0; z-index: 50;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem var(--gut);
-    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.04em;
-    backdrop-filter: blur(8px);
-    background: color-mix(in oklch, var(--ink) 72%, transparent);
-    border-bottom: 1px solid color-mix(in oklch, var(--line) 60%, transparent);
+    background: rgb(18 19 24 / 0.82);
+    backdrop-filter: saturate(1.4) blur(10px);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    border-bottom: 1px solid rgb(46 50 64 / 0.7);
   }
-  .topbar .mark { color: var(--signal); font-weight: 700; }
-  .topbar nav { display: flex; gap: 1.4rem; color: var(--muted); }
-  .topbar nav a { transition: color 0.2s var(--ease); }
-  .topbar nav a:hover { color: var(--bone); }
-  @media (max-width: 640px){ .topbar nav { display: none; } }
+  .top .wrap { display: flex; align-items: center; gap: 1.5rem; min-height: 4rem; }
+  .brand { display: inline-flex; align-items: baseline; gap: 0.45rem; text-decoration: none; font-weight: 600; letter-spacing: -0.01em; }
+  .brand b { font-family: var(--display); font-size: 1.35rem; font-weight: 600; color: var(--text); }
+  .brand span { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+  .top nav { margin-left: auto; }
+  .top nav ul { display: flex; gap: 0.25rem; list-style: none; }
+  .top nav a {
+    display: block; padding: 0.45rem 0.7rem; border-radius: 8px;
+    color: var(--text-2); font-size: 0.92rem; text-decoration: none;
+    transition: color 0.2s, background 0.2s;
+  }
+  .top nav a:hover { color: var(--text); background: var(--panel); }
+  @media (max-width: 760px) {
+    .top nav { display: none; }
+    .top .btn { margin-left: auto; }
+  }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    --b: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    min-height: 2.75rem; padding: 0.6rem 1.15rem; border-radius: 10px;
+    font: 600 0.95rem/1.2 var(--sans); text-decoration: none; white-space: nowrap;
+    border: 1px solid transparent; cursor: pointer;
+    transition: transform 0.2s var(--ease), background 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-solid { background: var(--b); color: var(--ink); }
+  .btn-solid:hover { background: color-mix(in srgb, var(--b) 82%, white); }
+  .btn-line { border-color: var(--line-2); color: var(--text); background: transparent; }
+  .btn-line:hover { border-color: var(--b); color: var(--b); }
+  .btn-sm { min-height: 2.4rem; padding: 0.45rem 0.9rem; font-size: 0.88rem; }
+  .btn .arr { transition: transform 0.2s var(--ease); }
+  .btn:hover .arr { transform: translateX(2px); }
 
   /* ---------- hero ---------- */
-  .hero { padding-top: clamp(3.5rem, 3rem + 6vw, 7rem); padding-bottom: var(--space-section); }
+  .hero { padding-block: clamp(3rem, 2rem + 5vw, 6.5rem) clamp(3.5rem, 2.5rem + 5vw, 6rem); }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(2rem, 1rem + 4vw, 4.5rem); align-items: center; }
+  @media (max-width: 920px) { .hero .wrap { grid-template-columns: 1fr; } }
+
+  .kicker {
+    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 1.25rem;
+  }
+  .kicker strong { color: var(--lime); font-weight: 500; }
+  h1 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(2.5rem, 1.5rem + 4.6vw, 4.6rem);
+    line-height: 1.02; letter-spacing: -0.025em;
+    margin-bottom: 1.4rem; text-wrap: balance;
+  }
+  h1 em { font-style: italic; font-weight: 500; color: var(--lime); }
+  .lede { color: var(--text-2); font-size: clamp(1.05rem, 1rem + 0.3vw, 1.2rem); max-width: 40rem; margin-bottom: 2rem; }
+  .lede a { color: var(--text); text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+  .lede a:hover { text-decoration-color: currentColor; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  /* router card */
+  .router {
+    background: linear-gradient(180deg, var(--panel), var(--ink-2));
+    border: 1px solid var(--line); border-radius: calc(var(--radius) + 4px);
+    padding: 0.6rem; box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.8);
+  }
+  .router h2 {
+    font: 500 0.78rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); padding: 0.9rem 0.9rem 0.8rem;
+  }
+  .router ul { list-style: none; display: grid; gap: 0.35rem; }
+  .route {
+    --c: var(--lime);
+    display: grid; grid-template-columns: auto 1fr auto; gap: 0.25rem 0.9rem; align-items: center;
+    padding: 0.9rem; border-radius: var(--radius); text-decoration: none;
+    border: 1px solid transparent; transition: background 0.2s, border-color 0.2s;
+  }
+  .route:hover { background: var(--panel-2); border-color: color-mix(in srgb, var(--c) 40%, transparent); }
+  .route .dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent); grid-row: span 2; }
+  .route .who { color: var(--text-2); font-size: 0.9rem; }
+  .route .what { font-weight: 600; grid-column: 2; }
+  .route .what span { color: var(--c); }
+  .route .go { grid-row: 1 / span 2; grid-column: 3; color: var(--muted); transition: transform 0.2s var(--ease), color 0.2s; }
+  .route:hover .go { color: var(--c); transform: translateX(3px); }
+
+  /* ---------- sections ---------- */
+  .section { padding-block: clamp(3.25rem, 2.25rem + 3.5vw, 5.25rem); border-top: 1px solid var(--line); }
   .eyebrow {
-    font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.22em;
-    text-transform: uppercase; color: var(--signal-dim);
-    display: flex; align-items: center; gap: 0.7rem; margin-bottom: 1.6rem;
-  }
-  .eyebrow::before { content: ""; width: 2.2rem; height: 1px; background: var(--signal-dim); display: inline-block; }
-
-  h1.title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(2.7rem, 1.4rem + 7vw, 6.6rem);
-    line-height: 0.98; letter-spacing: -0.02em;
-    color: var(--bone);
-    margin-bottom: 1.7rem;
-  }
-  h1.title em { font-style: italic; color: var(--signal); font-weight: 500; }
-
-  .lede {
-    max-width: 46ch; color: var(--bone-dim);
-    font-size: clamp(1rem, 0.95rem + 0.35vw, 1.18rem); line-height: 1.7;
-    margin-bottom: 2.4rem;
-  }
-  .lede strong { color: var(--bone); font-weight: 500; }
-
-  .cta-row { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: center; }
-  .btn {
-    font-family: var(--font-mono); font-size: 0.84rem; letter-spacing: 0.02em;
-    padding: 0.8rem 1.3rem; border: 1px solid var(--line);
     display: inline-flex; align-items: center; gap: 0.6rem;
-    transition: transform 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease);
+    font: 500 0.78rem/1.4 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+    margin-bottom: 1rem;
   }
-  .btn:hover { transform: translateY(-2px); }
-  .btn.primary { background: var(--signal); color: var(--ink); border-color: var(--signal); font-weight: 700; }
-  .btn.primary:hover { background: var(--bone); border-color: var(--bone); }
-  .btn.ghost:hover { border-color: var(--signal); color: var(--signal); }
-  .btn svg { width: 1em; height: 1em; }
-
-  /* hash-chain motif */
-  .chain { margin-top: 3.4rem; display: flex; align-items: center; gap: 0; flex-wrap: wrap;
-           font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
-  .chain .blk {
-    border: 1px solid var(--line); padding: 0.45rem 0.7rem; background: var(--ink-2);
-    position: relative; white-space: nowrap;
-    transition: color 0.3s var(--ease), border-color 0.3s var(--ease);
+  .eyebrow::before { content: ""; width: 1.6rem; height: 1px; background: currentColor; }
+  h2.title {
+    font-family: var(--display); font-weight: 600; letter-spacing: -0.02em;
+    font-size: clamp(2rem, 1.4rem + 2.6vw, 3.2rem); line-height: 1.05; margin-bottom: 0.4rem;
   }
-  .chain .blk:hover { color: var(--signal); border-color: var(--signal-dim); }
-  .chain .lnk { width: 1.5rem; height: 1px; background: var(--line); }
-  @media (max-width: 720px){ .chain { display: none; } }
+  .tagline { font-family: var(--display); font-style: italic; font-weight: 500; font-size: clamp(1.15rem, 1rem + 0.7vw, 1.5rem); color: var(--accent); margin-bottom: 1.2rem; line-height: 1.3; }
 
-  /* ---------- section header ---------- */
-  .sec { padding-block: clamp(3rem, 2rem + 4vw, 5rem); }
-  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-              border-top: 1px solid var(--line); padding-top: 1.2rem; margin-bottom: 2.8rem; }
-  .sec-head h2 {
-    font-family: var(--font-display); font-weight: 500; letter-spacing: -0.01em;
-    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.3rem); color: var(--bone);
+  /* product block */
+  .product .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 1rem + 4vw, 4.5rem); align-items: start; }
+  @media (max-width: 920px) { .product .wrap { grid-template-columns: 1fr; } }
+  .product.alt .copy { order: 2; }
+  @media (max-width: 920px) { .product.alt .copy { order: 0; } }
+  .copy > p { color: var(--text-2); margin-bottom: 1.4rem; max-width: 36rem; }
+  .points { list-style: none; display: grid; gap: 0.8rem; margin-bottom: 1.8rem; max-width: 36rem; }
+  .points li { position: relative; padding-left: 1.6rem; color: var(--text-2); }
+  .points li::before { content: ""; position: absolute; left: 0.1rem; top: 0.62em; width: 0.7rem; height: 0.38rem; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg); transform-origin: left top; }
+  .points strong { color: var(--text); font-weight: 600; }
+  .fine { font-size: 0.86rem; color: var(--muted); margin-top: 1.4rem; max-width: 36rem; }
+  .fine a { color: var(--text-2); text-underline-offset: 3px; }
+  .fine.note { margin-top: 0; }
+
+  .repo  { --accent: var(--repo); }
+  .ohiyo { --accent: var(--ohiyo); }
+  .wmcp  { --accent: var(--wmcp); }
+  .korg  { --accent: var(--lime); }
+
+  /* proof panel */
+  .proof { display: grid; gap: 1rem; }
+  @media (min-width: 921px) { .proof { position: sticky; top: 5.5rem; } }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    overflow: hidden;
   }
-  .sec-head .idx { font-family: var(--font-mono); font-size: 0.74rem; color: var(--signal-dim); letter-spacing: 0.18em; }
-
-  /* ---------- flagship cards ---------- */
-  .flagship { display: grid; gap: 1.3rem; }
-  .fcard {
-    position: relative; display: grid; grid-template-columns: 1fr auto; gap: 1.5rem;
-    align-items: start; padding: clamp(1.5rem, 1rem + 2vw, 2.6rem);
-    background: linear-gradient(180deg, var(--ink-2), var(--ink));
-    border: 1px solid var(--line); overflow: hidden;
-    transition: border-color 0.35s var(--ease), transform 0.35s var(--ease);
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 0.7rem 1rem; border-bottom: 1px solid var(--line); background: var(--ink-2);
+    font: 500 0.78rem/1.2 var(--mono); color: var(--muted);
   }
-  .fcard::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-    background: var(--signal); transform: scaleY(0); transform-origin: top;
-    transition: transform 0.4s var(--ease);
+  .card-head .lights { display: inline-flex; gap: 0.35rem; }
+  .card-head .lights i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--line-2); }
+  .copybtn {
+    font: 500 0.75rem/1 var(--mono); color: var(--text-2); background: transparent;
+    border: 1px solid var(--line-2); border-radius: 6px; padding: 0.4rem 0.6rem; cursor: pointer;
+    min-height: 1.9rem; transition: color 0.2s, border-color 0.2s;
   }
-  .fcard:hover { border-color: color-mix(in oklch, var(--signal) 40%, var(--line)); transform: translateY(-3px); }
-  .fcard:hover::before { transform: scaleY(1); }
-  .fcard .num { position: absolute; right: clamp(1rem,2vw,2rem); top: clamp(1rem,2vw,2rem);
-                font-family: var(--font-display); font-size: 3.4rem; color: var(--surface-2); line-height: 1; font-weight: 600; }
-  .fcard .body { max-width: 60ch; }
-  .fcard h3 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem,1.2rem+1.4vw,2.1rem);
-              color: var(--bone); margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.7rem; }
-  .fcard h3 .lang { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase;
-                    color: var(--signal); border: 1px solid var(--signal-dim); padding: 0.15rem 0.5rem; border-radius: 2px; }
-  .fcard .tag { font-family: var(--font-mono); font-size: 0.8rem; color: var(--signal-dim); margin-bottom: 1rem; letter-spacing: 0.01em; }
-  .fcard p { color: var(--bone-dim); font-size: 0.94rem; line-height: 1.7; margin-bottom: 1.3rem; }
-  .fcard .links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-  .fcard .links a {
-    font-family: var(--font-mono); font-size: 0.76rem; color: var(--bone-dim);
-    padding: 0.42rem 0.8rem; border: 1px solid var(--line);
-    transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+  .copybtn:hover { color: var(--accent); border-color: var(--accent); }
+  .no-js .copybtn { display: none; }
+  pre {
+    padding: 1rem 1.1rem; font-size: 0.84rem; line-height: 1.7; color: var(--text-2);
+    white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 2;
   }
-  .fcard .links a:hover { color: var(--ink); background: var(--signal); border-color: var(--signal); }
-  @media (max-width: 640px){ .fcard { grid-template-columns: 1fr; } .fcard .num { font-size: 2.4rem; } }
+  pre .c { color: var(--muted); }
+  pre .k { color: var(--accent); }
+  pre .ok { color: #8fe39b; }
+  pre .bad { color: #ff8a8a; }
 
-  /* ---------- selected work grid ---------- */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.1rem; }
-  .scard {
-    padding: 1.4rem; border: 1px solid var(--line); background: var(--ink-2);
-    display: flex; flex-direction: column; gap: 0.55rem;
-    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease), background 0.3s var(--ease);
+  .facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .facts div { padding: 0.95rem 1rem; border-top: 1px solid var(--line); }
+  .facts div:nth-child(odd) { border-right: 1px solid var(--line); }
+  .facts div:nth-child(-n+2) { border-top: 0; }
+  .facts dt { font: 500 0.72rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.3rem; }
+  .facts dd { font-weight: 600; font-size: 0.95rem; line-height: 1.35; }
+  @media (max-width: 340px) {
+    .facts { grid-template-columns: 1fr; }
+    .facts div:nth-child(odd) { border-right: 0; }
+    .facts div:nth-child(2) { border-top: 1px solid var(--line); }
   }
-  .scard:hover { border-color: var(--signal-dim); transform: translateY(-3px); background: var(--surface); }
-  .scard .top { display: flex; align-items: center; justify-content: space-between; }
-  .scard h4 { font-family: var(--font-display); font-size: 1.18rem; font-weight: 600; color: var(--bone); }
-  .scard .arrow { color: var(--muted); transition: color 0.2s var(--ease), transform 0.2s var(--ease); }
-  .scard:hover .arrow { color: var(--signal); transform: translate(2px,-2px); }
-  .scard p { color: var(--muted); font-size: 0.82rem; line-height: 1.6; }
-  .scard .meta { margin-top: auto; padding-top: 0.6rem; font-family: var(--font-mono); font-size: 0.68rem;
-                 letter-spacing: 0.08em; color: var(--signal-dim); text-transform: uppercase; }
 
-  /* ---------- focus strip ---------- */
-  .focus { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 1rem; }
-  .focus .f { border: 1px solid var(--line); padding: 1.4rem; background: var(--ink-2); }
-  .focus .f .k { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--signal-dim); margin-bottom: 0.6rem; }
-  .focus .f p { color: var(--bone-dim); font-size: 0.88rem; line-height: 1.65; }
+  .status {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font: 500 0.78rem/1 var(--mono); color: var(--text-2);
+    border: 1px solid var(--line-2); border-radius: 999px; padding: 0.4rem 0.7rem; margin-bottom: 1.4rem;
+  }
+  .status::before { content: ""; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--accent); }
 
-  /* ---------- footer ---------- */
-  footer { border-top: 1px solid var(--line); padding-block: clamp(3rem,2rem+4vw,5rem); margin-top: var(--space-section); }
-  footer .big { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.8rem,1.2rem+3vw,3.4rem);
-                color: var(--bone); line-height: 1.05; letter-spacing: -0.01em; margin-bottom: 1.8rem; }
-  footer .big a { color: var(--signal); border-bottom: 2px solid transparent; transition: border-color 0.25s var(--ease); }
-  footer .big a:hover { border-color: var(--signal); }
-  footer .row { display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: center; justify-content: space-between;
-                font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); }
-  footer .row .links { display: flex; gap: 1.2rem; }
-  footer .row a:hover { color: var(--signal); }
+  /* lock table (Ohiyo) */
+  .locks { list-style: none; }
+  .locks li { display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; padding: 0.85rem 1rem; border-top: 1px solid var(--line); font-size: 0.92rem; color: var(--text-2); }
+  .locks li:first-child { border-top: 0; }
+  .locks b { font: 500 0.8rem/1.6 var(--mono); color: var(--text); }
+  .locks .on b { color: #8fe39b; }
+  .locks .off b { color: var(--muted); }
+  .locks .new b { color: #ffd27a; }
+  @media (max-width: 420px) { .locks li { grid-template-columns: 1fr; gap: 0.2rem; } }
 
-  /* ---------- reveal animation ---------- */
-  .reveal { opacity: 0; transform: translateY(22px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
-  .reveal.in { opacity: 1; transform: none; }
-  .hero .reveal { transition-delay: var(--d, 0ms); }
+  /* korg */
+  .korg-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(2rem, 1rem + 4vw, 4.5rem); align-items: start; }
+  @media (max-width: 920px) { .korg-grid { grid-template-columns: 1fr; } }
+  .also { margin-top: clamp(3rem, 2rem + 3vw, 4.5rem); }
+  .also h3 { font: 500 0.78rem/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .also ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: 0.75rem; }
+  .also a {
+    display: flex; flex-direction: column; gap: 0.3rem; height: 100%;
+    padding: 1rem 1.1rem; border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--ink-2); text-decoration: none; transition: border-color 0.2s, background 0.2s;
+  }
+  .also a:hover { border-color: var(--line-2); background: var(--panel); }
+  .also b { font-weight: 600; }
+  .also span { color: var(--muted); font-size: 0.9rem; line-height: 1.5; }
+  .also small { margin-top: auto; padding-top: 0.4rem; font: 500 0.72rem/1 var(--mono); letter-spacing: 0.06em; color: var(--text-2); }
+
+  /* principles */
+  .principles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 2rem; list-style: none; }
+  @media (max-width: 820px) { .principles { grid-template-columns: 1fr; } }
+  .principles li { padding: 1.4rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--ink-2); }
+  .principles h3 { font-family: var(--display); font-weight: 600; font-size: 1.3rem; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+  .principles p { color: var(--text-2); font-size: 0.95rem; }
+  .principles a { color: var(--text); text-underline-offset: 3px; text-decoration-color: var(--line-2); }
+
+  /* closing */
+  .closing { text-align: left; }
+  .closing h2 { font-family: var(--display); font-weight: 600; letter-spacing: -0.02em; font-size: clamp(2rem, 1.4rem + 2.8vw, 3.4rem); line-height: 1.05; margin-bottom: 1rem; max-width: 22ch; text-wrap: balance; }
+  .closing .sub { color: var(--text-2); max-width: 38rem; margin-bottom: 2rem; }
+  .doors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 2.5rem; }
+  @media (max-width: 760px) { .doors { grid-template-columns: 1fr; } }
+  .doors a {
+    display: grid; gap: 0.25rem; padding: 1.1rem 1.2rem; border-radius: var(--radius);
+    border: 1px solid var(--line); background: var(--panel); text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s var(--ease);
+  }
+  .doors a:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .doors b { font-weight: 600; color: var(--accent); }
+  .doors span { color: var(--text-2); font-size: 0.92rem; }
+  .contact { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
+  footer { border-top: 1px solid var(--line); padding-block: 2rem; color: var(--muted); font-size: 0.88rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; }
+  footer a { color: var(--text-2); text-underline-offset: 3px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .rise { animation: rise 0.8s var(--ease) both; animation-delay: var(--d, 0ms); }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
     html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; }
   }
 </style>
 </head>
-<body>
-  <header class="topbar">
-    <span class="mark">ares<span style="color:var(--muted)">@New1Direction</span></span>
-    <nav>
-      <a href="#flagship">flagships</a>
-      <a href="#work">work</a>
-      <a href="#focus">focus</a>
-      <a href="#contact">contact</a>
+<body class="no-js">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#main" aria-label="ares, back to top"><b>ares</b><span>/ New1Direction</span></a>
+    <nav aria-label="Primary">
+      <ul>
+        <li><a href="#repoing">repo.ing</a></li>
+        <li><a href="#ohiyo">Ohiyo</a></li>
+        <li><a href="#wmcp">wmcp.sh</a></li>
+        <li><a href="#korg">Engineering</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
     </nav>
-  </header>
+    <a class="btn btn-solid btn-sm" href="#start">Pick a product</a>
+  </div>
+</header>
 
-  <main>
-    <section class="hero wrap">
-      <p class="eyebrow reveal" style="--d:0ms">Self-taught engineer</p>
-      <h1 class="title reveal" style="--d:80ms">Verifiable AI agent<br>infrastructure, <em>Rust</em><br>systems &amp; security.</h1>
-      <p class="lede reveal" style="--d:180ms">I build tooling that makes autonomous AI agents <strong>verifiable, recoverable, and safe to run</strong> — a tamper-evident execution ledger, burn-after-reading secret handling, and a coding agent that keeps its receipts.</p>
-      <div class="cta-row reveal" style="--d:260ms">
-        <a class="btn primary" href="https://github.com/New1Direction" target="_blank" rel="noopener">
-          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-          github.com/New1Direction
-        </a>
-        <a class="btn ghost" href="#flagship">view the work ↓</a>
-      </div>
-
-      <div class="chain reveal" style="--d:360ms" aria-hidden="true">
-        <span class="blk">block#0 · genesis</span><span class="lnk"></span>
-        <span class="blk">sha256:0a9f…c41</span><span class="lnk"></span>
-        <span class="blk">sha256:7b2e…d08</span><span class="lnk"></span>
-        <span class="blk">sha256:e1c4…5af</span><span class="lnk"></span>
-        <span class="blk" style="color:var(--signal);border-color:var(--signal-dim)">verified ✓</span>
-      </div>
-    </section>
-
-    <section class="sec wrap" id="flagship">
-      <div class="sec-head reveal">
-        <h2>Flagship projects</h2>
-        <span class="idx">01 — 03</span>
-      </div>
-      <div class="flagship">
-
-        <article class="fcard reveal">
-          <span class="num">01</span>
-          <div class="body">
-            <h3>korg <span class="lang">Rust</span></h3>
-            <p class="tag">A causally-ordered, rewindable event-ledger for autonomous AI agents.</p>
-            <p>Every step an agent takes is recorded in a hash-chained, tamper-evident ledger anyone can independently verify — then rewound to any prior state. Zero-trust by design, and no blockchain anywhere in sight.</p>
-            <div class="links">
-              <a href="https://github.com/New1Direction/korg" target="_blank" rel="noopener">repository →</a>
-              <a href="https://yvaehkorg.lol" target="_blank" rel="noopener">live ↗</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="fcard reveal">
-          <span class="num">02</span>
-          <div class="body">
-            <h3>ningen-shikkaku <span class="lang">Rust</span></h3>
-            <p class="tag">Burn-after-reading secrets for AI agents.</p>
-            <p>Keys live in <code>mlock</code>'d, non-swappable RAM, are served to agents over MCP, and are destroyed after N reads — or the instant your session dies. A hardened daemon (seccomp allowlist, no core dumps, a non-elidable memory wipe) shipped with a fully-documented, honest threat model.</p>
-            <div class="links">
-              <a href="https://github.com/New1Direction/ningen-shikkaku" target="_blank" rel="noopener">repository →</a>
-              <a href="https://new1direction.github.io/ningen-shikkaku/" target="_blank" rel="noopener">docs ↗</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="fcard reveal">
-          <span class="num">03</span>
-          <div class="body">
-            <h3>korgex <span class="lang">Python</span></h3>
-            <p class="tag">A verifiable AI coding agent that keeps the receipts.</p>
-            <p>Works with any model and keeps a checkable record of every change it makes — the agent loop bolted to korg's verification guarantees. Published on PyPI.</p>
-            <div class="links">
-              <a href="https://github.com/New1Direction/korgex" target="_blank" rel="noopener">repository →</a>
-              <a href="https://korgex-docs.pages.dev" target="_blank" rel="noopener">docs ↗</a>
-              <a href="https://pypi.org/project/korgex/" target="_blank" rel="noopener">pypi ↗</a>
-            </div>
-          </div>
-        </article>
-
-      </div>
-    </section>
-
-    <section class="sec wrap" id="work">
-      <div class="sec-head reveal">
-        <h2>Selected work</h2>
-        <span class="idx">// the rest of the stack</span>
-      </div>
-      <div class="grid">
-        <a class="scard reveal" href="https://github.com/New1Direction/thumper" target="_blank" rel="noopener">
-          <div class="top"><h4>thumper</h4><span class="arrow">↗</span></div>
-          <p>The local execution and self-recovery substrate beneath korgex: runs code fast and repairs its own errors.</p>
-          <span class="meta">Rust</span>
-        </a>
-        <a class="scard reveal" href="https://wmcp.sh" target="_blank" rel="noopener">
-          <div class="top"><h4>webmcp-anything</h4><span class="arrow">↗</span></div>
-          <p>Turn any website into agent-callable MCP tools with one line of config. Live at wmcp.sh.</p>
-          <span class="meta">TypeScript · live</span>
-        </a>
-        <a class="scard reveal" href="https://github.com/New1Direction/RepoLens" target="_blank" rel="noopener">
-          <div class="top"><h4>RepoLens</h4><span class="arrow">↗</span></div>
-          <p>Click any repository and get a straight answer on whether to actually use it.</p>
-          <span class="meta">JavaScript</span>
-        </a>
-        <a class="scard reveal" href="https://github.com/New1Direction/coherence-auditor" target="_blank" rel="noopener">
-          <div class="top"><h4>coherence-auditor</h4><span class="arrow">↗</span></div>
-          <p>Detects an LLM contradicting its own stated probabilities and prices the slip as a guaranteed-loss bet.</p>
-          <span class="meta">Python</span>
-        </a>
-        <a class="scard reveal" href="https://github.com/New1Direction/pi-platform" target="_blank" rel="noopener">
-          <div class="top"><h4>pi-platform</h4><span class="arrow">↗</span></div>
-          <p>A deterministic semantic execution kernel with a governance-first architecture.</p>
-          <span class="meta">Python</span>
-        </a>
-        <a class="scard reveal" href="https://github.com/New1Direction?tab=repositories" target="_blank" rel="noopener">
-          <div class="top"><h4>everything else</h4><span class="arrow">↗</span></div>
-          <p>The full set of public repositories on GitHub.</p>
-          <span class="meta">browse →</span>
-        </a>
-      </div>
-    </section>
-
-    <section class="sec wrap" id="focus">
-      <div class="sec-head reveal">
-        <h2>What I work on</h2>
-        <span class="idx">focus areas</span>
-      </div>
-      <div class="focus">
-        <div class="f reveal"><div class="k">Agent infrastructure</div><p>Ledgers, execution substrates, and verification layers that make autonomous agents auditable and recoverable rather than opaque.</p></div>
-        <div class="f reveal"><div class="k">Rust systems</div><p>Low-level, correctness-first systems work — locked memory, syscall sandboxing, deterministic state machines, hash-chained data structures.</p></div>
-        <div class="f reveal"><div class="k">Security</div><p>Secret handling, threat modeling that states its own limits honestly, and tooling that shrinks the window plaintext is reachable.</p></div>
-      </div>
-    </section>
-  </main>
-
-  <footer id="contact">
+<main id="main">
+  <!-- ============ HERO ============ -->
+  <section class="hero" aria-labelledby="hero-title">
     <div class="wrap">
-      <p class="big reveal">Open to roles in AI infrastructure, Rust systems,<br>and security. <a href="https://github.com/New1Direction" target="_blank" rel="noopener">Reach me on GitHub →</a></p>
-      <div class="row reveal">
-        <span>© 2026 · ares / New1Direction</span>
-        <span class="links">
-          <a href="https://github.com/New1Direction" target="_blank" rel="noopener">GitHub</a>
-        </span>
+      <div>
+        <p class="kicker rise">ares · <strong>self-taught engineer</strong> · Rust, TypeScript, security</p>
+        <h1 id="hero-title" class="rise" style="--d:60ms">I build products people can <em>use today.</em></h1>
+        <p class="lede rise" style="--d:120ms">Three live, open source products, each built for a different audience: <a href="#repoing">repo.ing</a> pays open source builders, <a href="#ohiyo">Ohiyo</a> is a free group chat with a lock for private conversations, and <a href="#wmcp">wmcp.sh</a> gives AI agents tools for any URL. For the deeper systems work, see <a href="#korg">Korg</a>.</p>
+        <div class="actions rise" style="--d:180ms">
+          <a class="btn btn-solid" href="#start">Find the right product <span class="arr" aria-hidden="true">→</span></a>
+          <a class="btn btn-line" href="https://github.com/New1Direction">Source on GitHub</a>
+        </div>
+      </div>
+
+      <nav class="router rise" id="start" style="--d:240ms" aria-labelledby="router-title">
+        <h2 id="router-title">Start where you are</h2>
+        <ul>
+          <li><a class="route" href="#repoing" style="--c:var(--repo)"><i class="dot" aria-hidden="true"></i><span class="who">I maintain or back open source</span><span class="what"><span>repo.ing</span> · markets that pay builders</span><span class="go" aria-hidden="true">→</span></a></li>
+          <li><a class="route" href="#ohiyo" style="--c:var(--ohiyo)"><i class="dot" aria-hidden="true"></i><span class="who">I want a group chat we own</span><span class="what"><span>Ohiyo</span> · free, open source chat</span><span class="go" aria-hidden="true">→</span></a></li>
+          <li><a class="route" href="#wmcp" style="--c:var(--wmcp)"><i class="dot" aria-hidden="true"></i><span class="who">I build AI agents</span><span class="what"><span>wmcp.sh</span> · any URL as MCP tools</span><span class="go" aria-hidden="true">→</span></a></li>
+          <li><a class="route" href="#korg" style="--c:var(--lime)"><i class="dot" aria-hidden="true"></i><span class="who">I'm evaluating the engineering</span><span class="what"><span>Korg</span> · verifiable agent ledger</span><span class="go" aria-hidden="true">→</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============ REPO.ING ============ -->
+  <section class="section product repo" id="repoing" aria-labelledby="repo-title">
+    <div class="wrap">
+      <div class="copy">
+        <p class="eyebrow">For open source builders</p>
+        <h2 class="title" id="repo-title">repo.ing</h2>
+        <p class="tagline">The market layer for open source.</p>
+        <p>Launch a market for any public GitHub repository or Hugging Face model on Solana. Every trade pays a fee to the project's builders, even before they show up to claim it.</p>
+        <ul class="points">
+          <li><strong>One market per project.</strong> Identity follows GitHub's permanent repository ID, so a rename or transfer doesn't create a duplicate.</li>
+          <li><strong>Builders get paid in SOL.</strong> A current repo admin verifies with GitHub, binds a wallet, and claims accrued fees.</li>
+          <li><strong>Accounting in public.</strong> Payouts, volume, and buyback receipts are published on the Stats page.</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-solid" href="https://repo.ing/explore">Explore markets <span class="arr" aria-hidden="true">→</span></a>
+          <a class="btn btn-line" href="https://repo.ing/builders">Claim builder fees</a>
+        </div>
+        <p class="fine">A community launch does not imply maintainer endorsement, and a repository token gives no ownership of the code, repository, brand, or business. Token trading is risky. <a href="https://github.com/New1Direction/repo.ing">Source (AGPL-3.0)</a> · <a href="https://repo.ing/stats">Protocol stats</a></p>
+      </div>
+
+      <div class="proof">
+        <div class="card">
+          <div class="card-head"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>launch from your repo</span><button class="copybtn" type="button" data-copy="bunx @repoing/cli launch">Copy</button></div>
+<pre><code><span class="c"># inside any GitHub-backed project</span>
+<span class="k">$</span> cd your-project
+<span class="k">$</span> bunx @repoing/cli launch
+<span class="c"># detects origin → opens a signed launch review.
+# the CLI never sees your keys; your wallet approves.</span></code></pre>
+        </div>
+        <div class="card">
+          <dl class="facts">
+            <div><dt>Status</dt><dd>Live on Solana mainnet</dd></div>
+            <div><dt>Builder share</dt><dd>0.994% of fee-paying trade value, pre-graduation</dd></div>
+            <div><dt>Works with</dt><dd>GitHub repos, Hugging Face models</dd></div>
+            <div><dt>GitHub permission</dt><dd>Metadata: read only</dd></div>
+          </dl>
+        </div>
       </div>
     </div>
-  </footer>
+  </section>
 
-  <script>
-    // staggered reveal on scroll (compositor-friendly: opacity + transform only)
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-    // hero reveals fire immediately on load
-    window.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.hero .reveal').forEach((el) => el.classList.add('in'));
+  <!-- ============ OHIYO ============ -->
+  <section class="section product ohiyo alt" id="ohiyo" aria-labelledby="ohiyo-title">
+    <div class="wrap">
+      <div class="copy">
+        <p class="eyebrow">For friends, clubs, and communities</p>
+        <h2 class="title" id="ohiyo-title">Ohiyo</h2>
+        <p class="tagline">Group chat that's actually yours.</p>
+        <p>A free, open source group chat: text, voice, video, screen share, and watch parties. Sign up with a username and password, no email needed, and send your friends an invite link.</p>
+        <ul class="points">
+          <li><strong>A lock for private chats.</strong> Turn it on in a DM or group chat and messages are encrypted on your device; one-to-one chats use the Signal Protocol.</li>
+          <li><strong>No ads, no paid tier.</strong> Themes, custom emoji, and GIF avatars are part of the app.</li>
+          <li><strong>Leave whenever you like.</strong> Rebuild a Discord server from its template, or self-host: one server program and one database file.</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-solid" href="https://app.ohiyo.gg">Open Ohiyo <span class="arr" aria-hidden="true">→</span></a>
+          <a class="btn btn-line" href="https://ohiyo.gg/#download">Desktop apps</a>
+        </div>
+        <p class="fine">Public beta. The lock is opt-in, and the encryption has not been externally audited yet; the threat model spells out what is and isn't protected. <a href="https://ohiyo.gg/threat-model.html">Threat model</a> · <a href="https://github.com/New1Direction/ohiyo">Source (AGPL-3.0)</a></p>
+      </div>
+
+      <div class="proof">
+        <div class="card">
+          <div class="card-head"><span>what the lock covers</span><span>ohiyo.gg</span></div>
+          <ul class="locks">
+            <li class="on"><b>Locked</b><span>DMs and group chats, once you turn the lock on. The server stores only ciphertext.</span></li>
+            <li class="off"><b>Not locked</b><span>Channels inside a space. Stored like any chat server's.</span></li>
+            <li class="new"><b>Experimental</b><span>Group-chat locks. A message sent while you were offline can be missed.</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <dl class="facts">
+            <div><dt>Status</dt><dd>Public beta, v0.3.1</dd></div>
+            <div><dt>Runs on</dt><dd>Browser · Mac · Linux</dd></div>
+            <div><dt>Stack</dt><dd>Rust (axum) · React 19 · Tauri 2</dd></div>
+            <div><dt>Price</dt><dd>Free</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WMCP ============ -->
+  <section class="section product wmcp" id="wmcp" aria-labelledby="wmcp-title">
+    <div class="wrap">
+      <div class="copy">
+        <p class="eyebrow">For AI agent developers</p>
+        <h2 class="title" id="wmcp-title">wmcp.sh</h2>
+        <p class="tagline">Turn any URL into agent-callable MCP tools.</p>
+        <p>A hosted, spec-compliant MCP server. Point Claude Code, Cursor, Codex, or any MCP client at a URL and your agent can read prices, list variants, or call an API on a site that ships no MCP server of its own.</p>
+        <ul class="points">
+          <li><strong>One endpoint, not one server per site.</strong> Shopify, JSON-LD, OpenAPI, and provider adapters run first; an LLM fallback produces best-effort tools.</li>
+          <li><strong>One line of config.</strong> Add the URL to your MCP client, or call the REST API directly.</li>
+          <li><strong>Free to try.</strong> Discovery is 100 reads a day with no signup; live tool execution starts at $39/mo.</li>
+        </ul>
+        <div class="actions">
+          <a class="btn btn-solid" href="https://wmcp.sh">Try it free <span class="arr" aria-hidden="true">→</span></a>
+          <a class="btn btn-line" href="https://wmcp.sh/directory">Browse the directory</a>
+        </div>
+        <p class="fine">Open-source adapters and SDKs for Python and JavaScript. <a href="https://github.com/New1Direction/webmcp-anything">Source (MIT)</a></p>
+      </div>
+
+      <div class="proof">
+        <div class="card">
+          <div class="card-head"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>no key needed for reads</span><button class="copybtn" type="button" data-copy="curl 'https://wmcp.sh/api/v1/tools?url=https://www.allbirds.com/products/mens-wool-runners'">Copy</button></div>
+<pre><code><span class="k">$</span> curl 'https://wmcp.sh/api/v1/tools?url=\
+    https://www.allbirds.com/products/mens-wool-runners'
+<span class="c"># → MCP-shaped tool list:</span>
+<span class="c">#   get_price · list_variants · add_to_cart</span></code></pre>
+        </div>
+        <div class="card">
+          <dl class="facts">
+            <div><dt>Status</dt><dd>Live at wmcp.sh</dd></div>
+            <div><dt>Protocol</dt><dd>JSON-RPC 2.0 over Streamable HTTP</dd></div>
+            <div><dt>Clients</dt><dd>Claude, Cursor, Codex, Cline, VS Code</dd></div>
+            <div><dt>Runs on</dt><dd>Cloudflare Workers + KV</dd></div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ KORG ============ -->
+  <section class="section korg" id="korg" aria-labelledby="korg-title">
+    <div class="wrap">
+      <div class="korg-grid">
+        <div class="copy">
+          <p class="eyebrow">The engineering</p>
+          <h2 class="title" id="korg-title">Korg</h2>
+          <p class="tagline">Prove what your AI agent did.</p>
+          <p>A separate project, and the clearest look at how I build: a tamper-evident, SHA-256-chained ledger for AI agents. Edit one recorded event and the verifier names it. No trust in the producer, no blockchain.</p>
+          <ul class="points">
+            <li><strong>Three independent verifiers.</strong> Rust, Python, and JavaScript implementations, differentially fuzzed against each other.</li>
+            <li><strong>Cross-vendor format.</strong> Adapters ingest Claude Code, OpenAI Codex CLI, and Grok Heavy traces into one <code>korg-ledger@v1</code> spec.</li>
+            <li><strong>Limits written down.</strong> v1 targets local, single-user workspaces, and agents must be told to log.</li>
+          </ul>
+          <div class="actions">
+            <a class="btn btn-solid" href="https://new1direction.github.io/korg/web/index.html">Verify a ledger in your browser <span class="arr" aria-hidden="true">→</span></a>
+            <a class="btn btn-line" href="https://github.com/New1Direction/korg">Read the source</a>
+          </div>
+          <p class="fine">Rust · MIT OR Apache-2.0 · <a href="https://crates.io/crates/korg">crates.io</a> · <a href="https://yvaehkorg.lol">yvaehkorg.lol</a></p>
+        </div>
+
+        <div class="proof">
+          <div class="card">
+            <div class="card-head"><span class="lights" aria-hidden="true"><i></i><i></i><i></i></span><span>korg-verify · tamper test</span></div>
+<pre><code><span class="k">$</span> korg-verify session.jsonl
+<span class="ok">✓ journal VALID — 6 events, hash-chain + DAG intact</span>
+
+<span class="c"># rewrite one line of the agent's edit</span>
+<span class="k">$</span> sed -i '4s/return a - b/return a + b/' session.jsonl
+
+<span class="k">$</span> korg-verify session.jsonl
+<span class="bad">✗ journal INVALID — 1 problem(s):
+    - seq 4: entry_hash mismatch (content was tampered)</span></code></pre>
+          </div>
+          <p class="fine note">Output from the repository's 30-second quickstart, using its sample Claude Code session.</p>
+        </div>
+      </div>
+
+      <div class="also">
+        <h3>Also built</h3>
+        <ul>
+          <li><a href="https://github.com/New1Direction/ningen-shikkaku"><b>ningen-shikkaku</b><span>Session-bound secrets in locked RAM, wiped the instant your session dies. MCP adapter for agents.</span><small>Rust</small></a></li>
+          <li><a href="https://github.com/New1Direction/korgex"><b>korgex</b><span>A provider-agnostic, MCP-native coding agent that records its work to a tamper-evident ledger.</span><small>Python · PyPI</small></a></li>
+          <li><a href="https://github.com/New1Direction/RepoLens"><b>RepoLens</b><span>Chrome extension with a verdict-first production-readiness read on GitHub, npm, and PyPI projects.</span><small>JavaScript</small></a></li>
+          <li><a href="https://github.com/New1Direction?tab=repositories"><b>Everything else</b><span>All public repositories, experiments included.</span><small>GitHub →</small></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW I SHIP ============ -->
+  <section class="section" aria-labelledby="how-title">
+    <div class="wrap">
+      <p class="eyebrow">How I ship</p>
+      <h2 class="title" id="how-title">Honest about what works.</h2>
+      <ul class="principles">
+        <li><h3>Say what's live</h3><p>repo.ing's README separates what is live from what is built but gated, down to which executors are switched off.</p></li>
+        <li><h3>Publish the limits</h3><p>Ohiyo ships a public <a href="https://ohiyo.gg/threat-model.html">threat model</a> and a list of known encryption limits. Korg documents where its guarantees stop.</p></li>
+        <li><h3>Keep it open</h3><p>All four projects are open source (AGPL-3.0, MIT, or MIT/Apache-2.0), so you can read the code before you trust it.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="section closing" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="eyebrow">Next step</p>
+      <h2 id="contact-title">Pick the product that fits, or say hello.</h2>
+      <p class="sub">Each product stands on its own. Start with the one that solves your problem, and reach out on X or GitHub for anything else.</p>
+      <div class="doors">
+        <a class="repo" href="https://repo.ing"><b>repo.ing →</b><span>Launch a market or claim builder fees</span></a>
+        <a class="ohiyo" href="https://app.ohiyo.gg"><b>Ohiyo →</b><span>Open the app, free, no email</span></a>
+        <a class="wmcp" href="https://wmcp.sh"><b>wmcp.sh →</b><span>Give your agent tools for any URL</span></a>
+      </div>
+      <div class="contact">
+        <a class="btn btn-line" href="https://x.com/AresAgent">Message @AresAgent on X</a>
+        <a class="btn btn-line" href="https://github.com/New1Direction">github.com/New1Direction</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 ares · New1Direction</span>
+    <span><a href="https://github.com/New1Direction/New1Direction.github.io">Site source</a></span>
+  </div>
+</footer>
+
+<p class="sr-only" aria-live="polite" id="copy-status"></p>
+<script>
+  document.body.classList.remove('no-js');
+  const status = document.getElementById('copy-status');
+  document.querySelectorAll('.copybtn').forEach((btn) => {
+    btn.setAttribute('aria-label', 'Copy command');
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(btn.dataset.copy);
+        btn.textContent = 'Copied';
+        status.textContent = 'Command copied to clipboard';
+      } catch {
+        btn.textContent = 'Copy failed';
+        status.textContent = 'Copy failed';
+      }
+      setTimeout(() => { btn.textContent = 'Copy'; status.textContent = ''; }, 1800);
     });
-  </script>
+  });
+</script>
 </body>
 </html>
