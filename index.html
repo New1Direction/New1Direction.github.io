@@ -590,6 +590,78 @@
       setTimeout(() => { btn.textContent = 'Copy'; status.textContent = ''; }, 1800);
     });
   });
+
+  /* ---------- outbound conversion analytics ----------
+     Measures clicks toward the four products without cookies, storage, or
+     personal identifiers. Links navigate natively; tracking never blocks them.
+
+     Each click on a product link dispatches a DOM event, `outbound:click`, on
+     document with detail { product, placement, destination, page }, so any
+     provider can listen, e.g.
+       document.addEventListener('outbound:click', (e) => plausible('Outbound', { props: e.detail }));
+     Set `endpoint` to also POST that detail as JSON (text/plain, no credentials,
+     no referrer) to a collector. Empty endpoint: no network requests.
+     Nothing is sent or dispatched when the visitor enables Global Privacy
+     Control or Do Not Track. Add `?analytics-debug` to the URL to log events. */
+  const analytics = {
+    endpoint: '',
+    products: {
+      repoing: { hosts: ['repo.ing'], paths: ['github.com/new1direction/repo.ing'] },
+      ohiyo:   { hosts: ['ohiyo.gg'], paths: ['github.com/new1direction/ohiyo'] },
+      wmcp:    { hosts: ['wmcp.sh'], paths: ['github.com/new1direction/webmcp-anything'] },
+      korg:    { hosts: ['yvaehkorg.lol'], paths: ['new1direction.github.io/korg', 'github.com/new1direction/korg', 'crates.io/crates/korg'] },
+    },
+  };
+
+  (() => {
+    const optedOut = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1' || window.doNotTrack === '1';
+    const debug = /[?&]analytics-debug\b/.test(location.search);
+    if (optedOut) return;
+
+    // Match a link to a product: its host (or a subdomain), or a path prefix
+    // compared whole segments at a time so /korg does not match /korgex.
+    const productFor = (url) => {
+      const host = url.hostname.toLowerCase().replace(/^www\./, '');
+      const path = (host + url.pathname.toLowerCase()).replace(/\/+$/, '');
+      for (const [product, rule] of Object.entries(analytics.products)) {
+        if (rule.hosts.some((h) => host === h || host.endsWith('.' + h))) return product;
+        if (rule.paths.some((p) => path === p || path.startsWith(p + '/'))) return product;
+      }
+      return null;
+    };
+
+    const track = (event) => {
+      try {
+        if (event.type === 'auxclick' && event.button !== 1) return;
+        const link = event.target.closest && event.target.closest('a[href]');
+        if (!link) return;
+        const url = new URL(link.href, location.href);
+        if (!/^https?:$/.test(url.protocol)) return;
+        const product = productFor(url);
+        if (!product) return;
+        const section = link.closest('section[id], nav[id], header, footer');
+        const detail = {
+          product,
+          placement: link.dataset.placement || (section ? section.id || section.localName : 'page'),
+          destination: url.hostname + url.pathname,
+          page: location.pathname,
+        };
+        document.dispatchEvent(new CustomEvent('outbound:click', { detail }));
+        if (debug) console.info('[analytics] outbound:click', detail);
+        if (analytics.endpoint && window.fetch) {
+          fetch(analytics.endpoint, {
+            method: 'POST', body: JSON.stringify(detail), keepalive: true, mode: 'no-cors',
+            credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store',
+            headers: { 'Content-Type': 'text/plain' },
+          }).catch(() => {});
+        }
+      } catch (err) {
+        if (debug) console.warn('[analytics]', err);
+      }
+    };
+    document.addEventListener('click', track, { capture: true, passive: true });
+    document.addEventListener('auxclick', track, { capture: true, passive: true });
+  })();
 </script>
 </body>
 </html>
